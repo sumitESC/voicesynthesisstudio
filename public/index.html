@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Synthesis Studio - IBM Watson Text to Speech</title>
+    <meta name="description" content="Convert text to speech with IBM Watson AI. Support for 40+ languages and multiple voice characters. Generate, play, and download high-quality audio.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.125rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .info-item i {
+            color: #3b82f6;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .card-title i {
+            color: #3b82f6;
+        }
+
+        .character-count {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .character-count.over-limit {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        /* Text Input Styles */
+        #textInput {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            color: #374151;
+            background: white;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: all 0.2s ease;
+        }
+
+        #textInput:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        #textInput::placeholder {
+            color: #9ca3af;
+        }
+
+        .input-info {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-items {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .info-items span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .info-items i {
+            font-size: 0.625rem;
+        }
+
+        .progress-container {
+            margin-top: 0.5rem;
+            height: 0.25rem;
+            background: #e5e7eb;
+            border-radius: 0.125rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            border-radius: 0.125rem;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-bar.over-limit {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        }
+
+        /* Configuration Styles */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .select-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .select-group label i {
+            color: #3b82f6;
+            font-size: 0.75rem;
+        }
+
+        .select-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: white;
+            color: #374151;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .select-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .voice-preview {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #dbeafe;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.5rem;
+        }
+
+        .preview-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #1e40af;
+        }
+
+        .preview-content i {
+            color: #3b82f6;
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid;
+        }
+
+        .loading-state {
+            background: #dbeafe;
+            border-color: #bfdbfe;
+        }
+
+        .success-state {
+            background: #dcfce7;
+            border-color: #bbf7d0;
+        }
+
+        .error-state {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .loading-state .status-content i {
+            color: #3b82f6;
+            font-size: 1.25rem;
+        }
+
+        .success-state .status-content i {
+            color: #16a34a;
+            font-size: 1.25rem;
+        }
+
+        .error-state .status-content i {
+            color: #dc2626;
+            font-size: 1.25rem;
+        }
+
+        .status-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .loading-state .status-title {
+            color: #1e40af;
+        }
+
+        .success-state .status-title {
+            color: #166534;
+        }
+
+        .error-state .status-title {
+            color: #991b1b;
+        }
+
+        .status-subtitle {
+            font-size: 0.75rem;
+            margin: 0;
+        }
+
+        .loading-state .status-subtitle {
+            color: #2563eb;
+        }
+
+        .success-state .status-subtitle {
+            color: #15803d;
+        }
+
+        .error-state .status-subtitle {
+            color: #b91c1c;
+        }
+
+        /* Audio Player Styles */
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 0.75rem;
+            border: 1px solid #d1d5db;
+        }
+
+        .control-btn {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .audio-container {
+            flex: 1;
+        }
+
+        .audio-container audio {
+            width: 100%;
+            height: 2.5rem;
+        }
+
+        .download-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 0.5rem;
+        }
+
+        .download-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .download-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #0369a1;
+            margin: 0;
+        }
+
+        .download-subtitle {
+            font-size: 0.75rem;
+            color: #0284c7;
+            margin: 0;
+        }
+
+        .download-btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #0284c7;
+        }
+
+        .no-audio-message {
+            padding: 2rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .no-audio-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .no-audio-content i {
+            font-size: 3rem;
+            color: #d1d5db;
+        }
+
+        .no-audio-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #374151;
+            margin: 0;
+        }
+
+        .no-audio-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        /* Usage Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .header-info {
+                justify-content: center;
+            }
+            
+            .card-header {
+                padding: 1rem;
+            }
+            
+            .card-content {
+                padding: 1rem;
+            }
+            
+            .audio-controls {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .download-info {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem 0;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.25rem;
+            }
+            
+            #textInput {
+                min-height: 150px;
+            }
+            
+            .info-items {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Voice Synthesis Studio</h1>
+                        <p>Powered by IBM Watson</p>
+                    </div>
+                </div>
+                <div class="header-info">
+                    <div class="info-item">
+                        <i class="fas fa-globe"></i>
+                        <span>40+ Languages Available</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="content-grid">
+                
+                <!-- Left Column - Text Input Section -->
+                <div class="left-column">
+                    
+                    <!-- Text Input Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-edit"></i>
+                                Text Input
+                            </h2>
+                            <span class="character-count" id="characterCount">0 characters</span>
+                        </div>
+                        <div class="card-content">
+                            <textarea 
+                                id="textInput" 
+                                placeholder="Enter the text you want to convert to speech. You can write up to 5000 characters..."
+                                maxlength="5000"
+                            >Hello! Welcome to Voice Synthesis Studio. This is a demonstration of IBM Watson's advanced text-to-speech capabilities. You can select from over 40 languages and multiple voice characters to create natural-sounding speech from any text.</textarea>
+                            
+                            <div class="input-info">
+                                <div class="info-items">
+                                    <span><i class="fas fa-exclamation-circle"></i> Maximum 5000 characters</span>
+                                    <span><i class="fas fa-globe"></i> 40+ languages supported</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Character limit progress -->
+                            <div class="progress-container">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice Configuration Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-cog"></i>
+                                Voice Configuration
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="config-grid">
+                                <!-- Language Selection -->
+                                <div class="select-group">
+                                    <label for="languageSelect">
+                                        <i class="fas fa-globe"></i> Language
+                                    </label>
+                                    <select id="languageSelect">
+                                        <option value="en-US">English (US)</option>
+                                        <option value="en-AU">English (Australian)</option>
+                                        <option value="en-GB">English (British)</option>
+                                        <option value="es-ES">Spanish (Spain)</option>
+                                        <option value="es-MX">Spanish (Mexico)</option>
+                                        <option value="fr-FR">French (France)</option>
+                                        <option value="fr-CA">French (Canada)</option>
+                                        <option value="de-DE">German</option>
+                                        <option value="it-IT">Italian</option>
+                                        <option value="pt-BR">Portuguese (Brazil)</option>
+                                        <option value="ja-JP">Japanese</option>
+                                        <option value="ko-KR">Korean</option>
+                                        <option value="zh-CN">Chinese (Mandarin)</option>
+                                        <option value="ar-AR">Arabic</option>
+                                        <option value="nl-NL">Dutch</option>
+                                        <option value="sv-SE">Swedish</option>
+                                        <option value="da-DK">Danish</option>
+                                        <option value="no-NO">Norwegian</option>
+                                        <option value="fi-FI">Finnish</option>
+                                        <option value="ru-RU">Russian</option>
+                                    </select>
+                                </div>
+
+                                <!-- Voice Character Selection -->
+                                <div class="select-group">
+                                    <label for="voiceSelect">
+                                        <i class="fas fa-volume-up"></i> Voice Character
+                                    </label>
+                                    <select id="voiceSelect">
+                                        <option value="en-US_AllisonExpressive">Allison (expressive)</option>
+                                        <option value="en-US_EmmaExpressive">Emma (expressive)</option>
+                                        <option value="en-US_LisaExpressive">Lisa (expressive)</option>
+                                        <option value="en-US_MichaelExpressive">Michael (expressive)</option>
+                                        <option value="en-US_KevinV3Voice">Kevin (neural)</option>
+                                        <option value="en-US_OliviaV3Voice">Olivia (neural)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Voice Preview -->
+                            <div class="voice-preview">
+                                <div class="preview-content">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span id="voicePreview">Preview: Allison - Natural, expressive female voice</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Audio Output Section -->
+                <div class="right-column">
+                    
+                    <!-- Generate Audio Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-volume-up"></i>
+                                Generate Audio
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <button id="generateBtn" class="generate-btn">
+                                <i class="fas fa-volume-up"></i>
+                                Generate Speech
+                            </button>
+
+                            <!-- Loading State -->
+                            <div id="loadingState" class="status-message loading-state" style="display: none;">
+                                <div class="status-content">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <div>
+                                        <p class="status-title">Generating speech...</p>
+                                        <p class="status-subtitle">This may take a few seconds</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Success State -->
+                            <div id="successState" class="status-message success-state" style="display: none;">
+                                <div class="status-content">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>
+                                        <p class="status-title">Speech generated successfully!</p>
+                                        <p class="status-subtitle">Ready to play or download</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Error State -->
+                            <div id="errorState" class="status-message error-state" style="display: none;">
+                                <div class="status-content">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <div>
+                                        <p class="status-title">Generation failed</p>
+                                        <p class="status-subtitle" id="errorMessage">Please check your credentials and try again</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audio Player Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-play"></i>
+                                Audio Player
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div id="audioPlayerSection" style="display: none;">
+                                <!-- Custom Audio Controls -->
+                                <div class="audio-controls">
+                                    <button id="playPauseBtn" class="control-btn">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    
+                                    <div class="audio-container">
+                                        <audio id="audioPlayer" controls controlsList="nodownload">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    </div>
+                                </div>
+
+                                <!-- Download Section -->
+                                <div class="download-section">
+                                    <div class="download-info">
+                                        <div>
+                                            <p class="download-title">Ready to download</p>
+                                            <p class="download-subtitle">High-quality WAV audio file</p>
+                                        </div>
+                                        <button id="downloadBtn" class="download-btn">
+                                            <i class="fas fa-download"></i>
+                                            Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="noAudioMessage" class="no-audio-message">
+                                <div class="no-audio-content">
+                                    <i class="fas fa-volume-mute"></i>
+                                    <div>
+                                        <p class="no-audio-title">No audio generated yet</p>
+                                        <p class="no-audio-subtitle">Generate speech from your text to see audio controls here</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Statistics Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Usage Statistics
+                            </h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="totalGenerated">0</div>
+                                    <div class="stat-label">Audio Files Generated</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="totalCharacters">0</div>
+                                    <div class="stat-label">Characters Processed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Voice configuration data
+        const VOICE_CONFIG = {
+            'en-US': {
+                name: 'English (US)',
+                voices: [
+                    { value: 'en-US_AllisonExpressive', name: 'Allison', description: 'Natural, expressive female voice', gender: 'female', quality: 'expressive' },
+                    { value: 'en-US_EmmaExpressive', name: 'Emma', description: 'Warm, friendly female voice', gender: 'female', quality: 'expressive' },
+                    { value: 'en-US_LisaExpressive', name: 'Lisa', description: 'Professional female voice', gender: 'female', quality: 'expressive' },
+                    { value: 'en-US_MichaelExpressive', name: 'Michael', description: 'Confident male voice', gender: 'male', quality: 'expressive' },
+                    { value: 'en-US_KevinV3Voice', name: 'Kevin', description: 'Advanced neural male voice', gender: 'male', quality: 'neural' },
+                    { value: 'en-US_OliviaV3Voice', name: 'Olivia', description: 'Advanced neural female voice', gender: 'female', quality: 'neural' },
+                    { value: 'en-US_AllisonV3Voice', name: 'Allison V3', description: 'Natural female voice (V3)', gender: 'female', quality: 'neural' },
+                    { value: 'en-US_EmilyV3Voice', name: 'Emily', description: 'Advanced neural female voice', gender: 'female', quality: 'neural' },
+                    { value: 'en-US_HenryV3Voice', name: 'Henry', description: 'Advanced neural male voice', gender: 'male', quality: 'neural' },
+                    { value: 'en-US_LisaV3Voice', name: 'Lisa V3', description: 'Professional female voice (V3)', gender: 'female', quality: 'neural' },
+                    { value: 'en-US_MichaelV3Voice', name: 'Michael V3', description: 'Confident male voice (V3)', gender: 'male', quality: 'neural' }
+                ]
+            },
+            'en-AU': {
+                name: 'English (Australian)',
+                voices: [
+                    { value: 'en-AU_HeidiExpressive', name: 'Heidi', description: 'Australian female voice', gender: 'female', quality: 'expressive' },
+                    { value: 'en-AU_JackExpressive', name: 'Jack', description: 'Australian male voice', gender: 'male', quality: 'expressive' },
+                    { value: 'en-AU_MichaelExpressive', name: 'Michael', description: 'Australian male voice', gender: 'male', quality: 'expressive' }
+                ]
+            },
+            'en-GB': {
+                name: 'English (British)',
+                voices: [
+                    { value: 'en-GB_CharlotteV3Voice', name: 'Charlotte', description: 'British female voice', gender: 'female', quality: 'neural' },
+                    { value: 'en-GB_KateV3Voice', name: 'Kate', description: 'British female voice', gender: 'female', quality: 'neural' },
+                    { value: 'en-GB_GeorgeExpressive', name: 'George', description: 'British male voice', gender: 'male', quality: 'expressive' },
+                    { value: 'en-GB_GeorgeNatural', name: 'George Natural', description: 'British male voice (natural)', gender: 'male', quality: 'natural' },
+                    { value: 'en-GB_ChloeNatural', name: 'Chloe', description: 'British female voice (natural)', gender: 'female', quality: 'natural' }
+                ]
+            },
+            'es-ES': {
+                name: 'Spanish (Spain)',
+                voices: [
+                    { value: 'es-ES_EnriqueV3Voice', name: 'Enrique', description: 'Spanish male voice', gender: 'male', quality: 'neural' },
+                    { value: 'es-ES_LauraV3Voice', name: 'Laura', description: 'Spanish female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'es-MX': {
+                name: 'Spanish (Mexico)',
+                voices: [
+                    { value: 'es-LA_SofiaV3Voice', name: 'Sofia', description: 'Latin American Spanish female voice', gender: 'female', quality: 'neural' },
+                    { value: 'es-LA_DanielaExpressive', name: 'Daniela', description: 'Latin American Spanish female voice', gender: 'female', quality: 'expressive' }
+                ]
+            },
+            'fr-FR': {
+                name: 'French (France)',
+                voices: [
+                    { value: 'fr-FR_NicolasV3Voice', name: 'Nicolas', description: 'French male voice', gender: 'male', quality: 'neural' },
+                    { value: 'fr-FR_ReneeV3Voice', name: 'Renee', description: 'French female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'fr-CA': {
+                name: 'French (Canada)',
+                voices: [
+                    { value: 'fr-CA_LouiseV3Voice', name: 'Louise', description: 'Canadian French female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'de-DE': {
+                name: 'German',
+                voices: [
+                    { value: 'de-DE_BirgitV3Voice', name: 'Birgit', description: 'German female voice', gender: 'female', quality: 'neural' },
+                    { value: 'de-DE_DieterV3Voice', name: 'Dieter', description: 'German male voice', gender: 'male', quality: 'neural' },
+                    { value: 'de-DE_ErikaV3Voice', name: 'Erika', description: 'German female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'it-IT': {
+                name: 'Italian',
+                voices: [
+                    { value: 'it-IT_FrancescaV3Voice', name: 'Francesca', description: 'Italian female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'pt-BR': {
+                name: 'Portuguese (Brazil)',
+                voices: [
+                    { value: 'pt-BR_IsabelaV3Voice', name: 'Isabela', description: 'Brazilian Portuguese female voice', gender: 'female', quality: 'neural' },
+                    { value: 'pt-BR_LucasExpressive', name: 'Lucas', description: 'Brazilian Portuguese male voice', gender: 'male', quality: 'expressive' }
+                ]
+            },
+            'ja-JP': {
+                name: 'Japanese',
+                voices: [
+                    { value: 'ja-JP_EmiV3Voice', name: 'Emi', description: 'Japanese female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'ko-KR': {
+                name: 'Korean',
+                voices: [
+                    { value: 'ko-KR_JinV3Voice', name: 'Jin', description: 'Korean male voice', gender: 'male', quality: 'neural' }
+                ]
+            },
+            'zh-CN': {
+                name: 'Chinese (Mandarin)',
+                voices: [
+                    { value: 'zh-CN_ZhangJingVoice', name: 'Zhang Jing', description: 'Mandarin Chinese female voice', gender: 'female', quality: 'standard' }
+                ]
+            },
+            'ar-AR': {
+                name: 'Arabic',
+                voices: [
+                    { value: 'ar-MS_OmarVoice', name: 'Omar', description: 'Arabic male voice', gender: 'male', quality: 'standard' }
+                ]
+            },
+            'nl-NL': {
+                name: 'Dutch',
+                voices: [
+                    { value: 'nl-NL_MerelV3Voice', name: 'Merel', description: 'Dutch female voice', gender: 'female', quality: 'neural' }
+                ]
+            },
+            'sv-SE': {
+                name: 'Swedish',
+                voices: [
+                    { value: 'sv-SE_IngridVoice', name: 'Ingrid', description: 'Swedish female voice', gender: 'female', quality: 'standard' }
+                ]
+            },
+            'da-DK': {
+                name: 'Danish',
+                voices: [
+                    { value: 'da-DK_IdaVoice', name: 'Ida', description: 'Danish female voice', gender: 'female', quality: 'standard' }
+                ]
+            },
+            'no-NO': {
+                name: 'Norwegian',
+                voices: [
+                    { value: 'no-NO_LivVoice', name: 'Liv', description: 'Norwegian female voice', gender: 'female', quality: 'standard' }
+                ]
+            },
+            'fi-FI': {
+                name: 'Finnish',
+                voices: [
+                    { value: 'fi-FI_NooraVoice', name: 'Noora', description: 'Finnish female voice', gender: 'female', quality: 'standard' }
+                ]
+            },
+            'ru-RU': {
+                name: 'Russian',
+                voices: [
+                    { value: 'ru-RU_EkaterinaVoice', name: 'Ekaterina', description: 'Russian female voice', gender: 'female', quality: 'standard' }
+                ]
+            }
+        };
+
+        // Application state
+        let currentAudioUrl = null;
+        let audioElement = null;
+        let isPlaying = false;
+        let usageStats = { totalGenerated: 0, totalCharacters: 0 };
+
+        // DOM elements
+        const textInput = document.getElementById('textInput');
+        const characterCount = document.getElementById('characterCount');
+        const progressBar = document.getElementById('progressBar');
+        const languageSelect = document.getElementById('languageSelect');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voicePreview = document.getElementById('voicePreview');
+        const generateBtn = document.getElementById('generateBtn');
+        const loadingState = document.getElementById('loadingState');
+        const successState = document.getElementById('successState');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+        const audioPlayerSection = document.getElementById('audioPlayerSection');
+        const noAudioMessage = document.getElementById('noAudioMessage');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const totalGenerated = document.getElementById('totalGenerated');
+        const totalCharacters = document.getElementById('totalCharacters');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+        });
+
+        function initializeApp() {
+            // Update character count
+            updateCharacterCount();
+            
+            // Update voice options for default language
+            updateVoiceOptions();
+            
+            // Update voice preview
+            updateVoicePreview();
+            
+            // Load usage statistics
+            loadUsageStats();
+        }
+
+        function setupEventListeners() {
+            // Text input events
+            textInput.addEventListener('input', updateCharacterCount);
+            
+            // Language selection
+            languageSelect.addEventListener('change', function() {
+                updateVoiceOptions();
+                updateVoicePreview();
+            });
+            
+            // Voice selection
+            voiceSelect.addEventListener('change', updateVoicePreview);
+            
+            // Generate button
+            generateBtn.addEventListener('click', generateSpeech);
+            
+            // Audio player events
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            downloadBtn.addEventListener('click', downloadAudio);
+            
+            // Audio element events
+            audioPlayer.addEventListener('ended', function() {
+                isPlaying = false;
+                updatePlayPauseButton();
+            });
+            
+            audioPlayer.addEventListener('loadeddata', function() {
+                audioElement = audioPlayer;
+            });
+        }
+
+        function updateCharacterCount() {
+            const count = textInput.value.length;
+            const maxChars = 5000;
+            const isOverLimit = count > maxChars;
+            
+            characterCount.textContent = `${count} characters`;
+            characterCount.classList.toggle('over-limit', isOverLimit);
+            
+            // Update progress bar
+            const percentage = Math.min((count / maxChars) * 100, 100);
+            progressBar.style.width = `${percentage}%`;
+            progressBar.classList.toggle('over-limit', isOverLimit);
+            
+            // Enable/disable generate button
+            generateBtn.disabled = count === 0 || isOverLimit;
+        }
+
+        function updateVoiceOptions() {
+            const selectedLanguage = languageSelect.value;
+            const voices = VOICE_CONFIG[selectedLanguage]?.voices || [];
+            
+            // Clear current options
+            voiceSelect.innerHTML = '';
+            
+            // Add voice options
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.value;
+                option.textContent = `${voice.name} (${voice.quality})`;
+                voiceSelect.appendChild(option);
+            });
+            
+            // Select first voice if available
+            if (voices.length > 0) {
+                voiceSelect.value = voices[0].value;
+            }
+        }
+
+        function updateVoicePreview() {
+            const selectedLanguage = languageSelect.value;
+            const selectedVoice = voiceSelect.value;
+            const voices = VOICE_CONFIG[selectedLanguage]?.voices || [];
+            const voice = voices.find(v => v.value === selectedVoice);
+            
+            if (voice) {
+                voicePreview.textContent = `Preview: ${voice.name} - ${voice.description}`;
+            } else {
+                voicePreview.textContent = 'No voice selected';
+            }
+        }
+
+        async function generateSpeech() {
+            const text = textInput.value.trim();
+            const voice = voiceSelect.value;
+            
+            if (!text) {
+                showError('Please enter some text to convert to speech.');
+                return;
+            }
+            
+            if (text.length > 5000) {
+                showError('Please limit your text to 5000 characters or less.');
+                return;
+            }
+            
+            // Show loading state
+            showLoading();
+            generateBtn.disabled = true;
+            
+            try {
+                const apiKey = "E5TpbxOFantTuWO_gLmCXPuaVsrgO76GSo8AJUiDaj8d";
+                const apiUrl = `https://api.au-syd.text-to-speech.watson.cloud.ibm.com/instances/8f52969f-3802-46fe-baa8-62365e535c5d/v1/synthesize?voice=${voice}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "audio/wav",
+                        "Authorization": "Basic " + btoa("apikey:" + apiKey)
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(response.statusText || 'Failed to generate speech');
+                }
+                
+                const audioBlob = await response.blob();
+                currentAudioUrl = URL.createObjectURL(audioBlob);
+                audioPlayer.src = currentAudioUrl;
+                
+                // Update usage stats
+                usageStats.totalGenerated++;
+                usageStats.totalCharacters += text.length;
+                updateUsageStatsDisplay();
+                
+                showSuccess();
+                showAudioPlayer();
+                
+            } catch (error) {
+                console.error('Speech generation error:', error);
+                showError(error.message || 'Failed to generate speech. Please try again.');
+            } finally {
+                generateBtn.disabled = false;
+            }
+        }
+
+        function showLoading() {
+            hideAllStates();
+            loadingState.style.display = 'block';
+            loadingState.classList.add('fade-in');
+        }
+
+        function showSuccess() {
+            hideAllStates();
+            successState.style.display = 'block';
+            successState.classList.add('fade-in');
+            
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successState.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            hideAllStates();
+            errorMessage.textContent = message;
+            errorState.style.display = 'block';
+            errorState.classList.add('fade-in');
+            
+            // Hide error message after 5 seconds
+            setTimeout(() => {
+                errorState.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideAllStates() {
+            loadingState.style.display = 'none';
+            successState.style.display = 'none';
+            errorState.style.display = 'none';
+        }
+
+        function showAudioPlayer() {
+            noAudioMessage.style.display = 'none';
+            audioPlayerSection.style.display = 'block';
+            audioPlayerSection.classList.add('fade-in');
+        }
+
+        function togglePlayPause() {
+            if (!audioElement || !currentAudioUrl) return;
+            
+            if (isPlaying) {
+                audioElement.pause();
+                isPlaying = false;
+            } else {
+                audioElement.play();
+                isPlaying = true;
+            }
+            
+            updatePlayPauseButton();
+        }
+
+        function updatePlayPauseButton() {
+            const icon = playPauseBtn.querySelector('i');
+            if (isPlaying) {
+                icon.className = 'fas fa-pause';
+            } else {
+                icon.className = 'fas fa-play';
+            }
+        }
+
+        function downloadAudio() {
+            if (!currentAudioUrl) return;
+            
+            const link = document.createElement('a');
+            link.href = currentAudioUrl;
+            link.download = 'voice-synthesis.wav';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function loadUsageStats() {
+            // In a real app, you would fetch this from your backend
+            // For this demo, we'll just use the local state
+            updateUsageStatsDisplay();
+        }
+
+        function updateUsageStatsDisplay() {
+            totalGenerated.textContent = usageStats.totalGenerated || 0;
+            totalCharacters.textContent = (usageStats.totalCharacters || 0).toLocaleString();
+        }
+    </script>
+</body>
+</html>
